@@ -100,11 +100,12 @@ computed by Gauss--Hermite quadrature (Hull--White style semi-analytic pricing \
 $10^{-8}$ with 32 nodes). For $\rho>0.9$ the conditional probabilities become steep in $m$ and fixed nodes fail
 (at $\rho=0.99$, 64 Gauss--Hermite nodes gave 140bp against a Monte Carlo 128bp); we switch to a fine
 trapezoid rule there. With name-specific recoveries the protection leg uses
-$P(\tau_1\in\mathrm dt,\ \text{first}=i\mid M)=\mathrm dp_i(t|M)\prod_{j\ne i}(1-p_j(t|M))$. The FtD swap's legs are those
-of a CDS with survival $S_1$.
+\[P(\tau_1\in\mathrm dt,\ \text{first}=i\mid M)=\mathrm dp_i(t|M)\prod_{j\ne i}\big(1-p_j(t|M)\big).\]
+The FtD swap's legs are those of a CDS with survival $S_1$.
 
 \paragraph{Monte Carlo.} Default times are simulated by inverting the cumulative hazard,
-$\tau_i=\Lambda_i^{-1}(-\log U_i)$, with antithetic variates; legs are evaluated exactly per path. The
+$\tau_i=\Lambda_i^{-1}(-\log U_i)$, with antithetic variates, and the legs are evaluated exactly on
+each path. The
 semi-analytic and Monte Carlo spreads agree within one to two standard errors at every correlation
 (e.g.\ at $\rho=0.6$, 280.83bp semi-analytic against $281.19\pm0.37$bp from 2 million paths).
 
