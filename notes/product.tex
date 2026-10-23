@@ -1,0 +1,231 @@
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+\title{A first-to-default basket credit-linked note:\\ product, pricing and hedging}
+\author{Zak Claridge}
+\date{October 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+We describe a 5-year funded first-to-default (FtD) credit-linked note (CLN) on five
+investment-grade names: how credit default swaps work, why such notes exist, how the FtD spread
+depends on default correlation, and how the note is priced (piecewise-constant hazard rates
+bootstrapped ISDA-style, one-factor Gaussian copula, semi-analytic and Monte Carlo) and hedged
+(single-name CS01, jump-to-default, correlation). All market data is synthetic and illustrative.
+\end{abstract}
+\tableofcontents
+
+\section*{Notation and conventions}
+\begin{itemize}[nosep]
+\item Time $t$ in years; premium dates quarterly, $\Delta_i=t_i-t_{i-1}=0.25$ (real CDS use ACT/360 and
+IMM dates; we use the same simplified convention in bootstrapping and repricing).
+\item $P(t)$: OIS discount factor; $Q_i(t)$: survival probability of name $i$; $\lambda_i$: hazard rate;
+$R_i$: recovery rate (40\%); $\tau_i$: default time; $\tau_1=\min_i\tau_i$; $S_1(t)=P(\tau_1>t)$.
+\item Protection \emph{buyer} pays the premium and is long credit protection (gains when spreads widen).
+The CLN \emph{investor} is short protection. Spreads in basis points (bp) per year.
+\end{itemize}
+
+\section{Credit default swaps}
+A CDS on a reference entity transfers its credit risk: the protection buyer pays a premium (a spread
+or a standard coupon) quarterly until maturity or default; on a \emph{credit event} the seller pays
+$1-R$ per unit notional.
+\begin{itemize}[nosep]
+\item \textbf{Credit events} (ISDA definitions): bankruptcy, failure to pay and, for some contracts
+and regions, restructuring (and obligation acceleration/repudiation for some sovereigns). A
+Determinations Committee rules whether an event occurred.
+\item \textbf{Settlement} is by auction: dealers bid for deliverable bonds and the auction's final
+price fixes $R$ for all contracts.
+\item \textbf{Standard coupons and upfront.} Since 2009 contracts trade with a fixed coupon (100bp or
+500bp for most corporates) and an upfront payment that makes the trade fair:
+upfront $=\text{protection}-C\times\mathrm{RPV01}$. A name quoting 125bp with a 100bp coupon has a positive
+upfront paid by the buyer.
+\item \textbf{Accrued premium.} At default the buyer pays the premium accrued since the last coupon date.
+\end{itemize}
+With survival $Q$ and recovery $R$, the premium leg per unit spread (RPV01) and the protection leg are
+\begin{align*}
+\mathrm{RPV01}&=\sum_i\Delta_iP(t_i)Q(t_i)+\sum_i\int_{t_{i-1}}^{t_i}(s-t_{i-1})P(s)\,(-\mathrm dQ(s)),\\
+\text{protection}&=(1-R)\int_0^TP(s)\,(-\mathrm dQ(s)),\qquad\text{par spread}=\frac{\text{protection}}{\mathrm{RPV01}}.
+\end{align*}
+\paragraph{Bootstrap.} Hazards are piecewise constant between the quoted tenors (1, 3, 5, 7, 10 years)
+and solved tenor by tenor so that each par spread is reproduced; legs are integrated on a fine grid
+with flat forwards between knots, as in the ISDA standard model. Every input is repriced to better
+than $10^{-4}$bp. For a flat hazard and flat rate the protection leg is
+$(1-R)\frac{\lambda}{\lambda+r}(1-e^{-(\lambda+r)T})$ and $s\approx(1-R)\lambda$ (the ``credit triangle''); both are tests.
+Not every set of quotes is attainable with non-negative hazards (e.g.\ 10bp out to 7 years and 800bp at
+10 years); the bootstrap rejects such inputs.
+
+\section{The credit-linked note}
+\subsection{Structure}
+A bankruptcy-remote special purpose vehicle (SPV) issues the note to the investor for $N$ and invests the
+cash in high-quality collateral. It enters an FtD swap with a dealer, selling protection on the basket.
+The investor receives quarterly coupons of floating (OIS) $+\,s$ until maturity or the first credit event.
+At the first credit event the note terminates: the collateral is sold, the dealer is paid $N(1-R_i)$
+under the swap, and the investor receives $NR_i$. Without a default the investor receives $N$ at maturity.
+Economically, the investor is long the collateral and short first-to-default protection.
+
+\subsection{Why it exists}
+\begin{itemize}[nosep]
+\item \emph{Investor}: credit exposure in a funded, securities format, without ISDA documentation,
+collateral agreements or derivatives permissions, and a coupon well above any single name: about 372bp
+over OIS here against single-name 5y spreads of 60--125bp.
+\item \emph{Dealer/bank}: offloads concentration or correlation risk (it is long FtD protection) to an
+investor, funded, so without counterparty exposure to that investor.
+\end{itemize}
+
+\subsection{Why the FtD spread lies between the widest spread and the sum}
+\begin{proposition}\label{prop:bounds}
+For every $t$, $\max_i P(\tau_i\le t)\le P(\tau_1\le t)\le\sum_iP(\tau_i\le t)$. In the one-factor Gaussian
+copula with correlation $\rho\ge0$, $S_1(t)=P(\tau_1>t)$ is non-decreasing in $\rho$; at $\rho=0$ it is
+$\prod_iQ_i(t)$, and at $\rho=1$ (comonotone defaults) it is $\min_iQ_i(t)$.
+\end{proposition}
+\begin{proof}
+$\{\tau_i\le t\}\subseteq\{\tau_1\le t\}=\bigcup_j\{\tau_j\le t\}$ gives both bounds. In the copula,
+$\{\tau_1>t\}=\bigcap_i\{X_i>c_i(t)\}$ with $c_i(t)=\Phi^{-1}(1-Q_i(t))$ and $(X_i)$ standard Gaussian with
+pairwise correlation $\rho$. By Slepian's inequality \cite{slepian1962}, for Gaussian vectors with fixed
+unit variances the orthant probability $P(X_i>c_i\ \forall i)$ is non-decreasing in every pairwise
+correlation. The extreme cases are independence and $X_1=\dots=X_n$.
+\end{proof}
+Since spreads are roughly $(1-R)\times$ hazard, the FtD spread moves from about the sum of the spreads
+(independence: one of five things going wrong) towards the widest single-name spread (comonotone: the
+riskiest name defaults first, and the others with it). Correlation \emph{lowers} the FtD spread: the investor
+is long correlation.
+
+\section{Pricing}
+\subsection{One-factor Gaussian copula}
+Following Li \cite{li2000}, $\tau_i=Q_i^{-1}(\Phi(X_i))$ with $X_i=\sqrt\rho\,M+\sqrt{1-\rho}\,Z_i$. Conditional on $M$
+the defaults are independent with $p_i(t|M)=\Phi\big((\Phi^{-1}(1-Q_i(t))-\sqrt\rho M)/\sqrt{1-\rho}\big)$, so
+\[
+S_1(t)=\int\phi(m)\prod_i\big(1-p_i(t|m)\big)\mathrm dm,
+\]
+computed by Gauss--Hermite quadrature (Hull--White style semi-analytic pricing \cite{hw2004}; converged to
+$10^{-8}$ with 32 nodes). For $\rho>0.9$ the conditional probabilities become steep in $m$ and fixed nodes fail
+(at $\rho=0.99$, 64 Gauss--Hermite nodes gave 140bp against a Monte Carlo 128bp); we switch to a fine
+trapezoid rule there. With name-specific recoveries the protection leg uses
+$P(\tau_1\in\mathrm dt,\ \text{first}=i\mid M)=\mathrm dp_i(t|M)\prod_{j\ne i}(1-p_j(t|M))$. The FtD swap's legs are those
+of a CDS with survival $S_1$.
+
+\paragraph{Monte Carlo.} Default times are simulated by inverting the cumulative hazard,
+$\tau_i=\Lambda_i^{-1}(-\log U_i)$, with antithetic variates; legs are evaluated exactly per path. The
+semi-analytic and Monte Carlo spreads agree within one to two standard errors at every correlation
+(e.g.\ at $\rho=0.6$, 280.83bp semi-analytic against $281.19\pm0.37$bp from 2 million paths).
+
+\subsection{CLN valuation}
+With deterministic rates independent of defaults and coupons stopping at default (no accrued coupon),
+\[
+\mathrm{PV}=\sum_i\big[P(t_{i-1})-P(t_i)\big]S_1(t_i)+s\sum_i\Delta_iP(t_i)S_1(t_i)
++\int_0^TP(t)\sum_iR_i\,\mathrm dF_{1,i}(t)+P(T)S_1(T),
+\]
+where the first term values the floating coupons ($P(t_{i-1})/P(t_i)-1$ is the forward rate times
+the accrual) and $F_{1,i}$ is the probability that name $i$ is the first to default. A default-free note
+is a par floater (PV $=1$ at $s=0$; tested). The fair spread $s^*$ solves PV $=1$.
+\begin{observation}
+At $\rho=0.3$ the FtD par spread is 366.6bp and the CLN fair spread over OIS is 372.1bp. The difference
+arises because the CLN investor receives no accrued coupon at default whereas the FtD protection seller does.
+\end{observation}
+
+\subsection{Results}
+Five names with 5y spreads 60--125bp (sum 455bp, widest 125bp), recovery 40\%, OIS zero rates 3.6--4.0\%.
+The FtD spread falls from 443bp at $\rho=0$ to 130bp at $\rho=0.99$ (Figure in the README); a Student-$t$
+copula with 4 degrees of freedom gives lower FtD spreads at every $\rho$ (e.g.\ 297bp vs 339bp at $\rho=0.4$)
+because tail dependence makes defaults come together, which helps a first-to-default seller. Even at
+$\rho=0$ the $t$ copula has dependence (383.5bp vs 443.4bp), through its common $\chi^2$ mixing variable.
+
+\section{Hedging}
+\subsection{Sensitivities}
+From the investor's side, at $\rho=0.3$ and the fair spread (per unit notional):
+\begin{center}\small
+\begin{tabular}{lrrrrr}\toprule
+& A & B & C & D & E\\\midrule
+5y spread (bp) & 80 & 100 & 60 & 125 & 90\\
+CS01 (bp of notional per bp) & $-2.97$ & $-3.08$ & $-2.84$ & $-3.20$ & $-3.03$\\
+CS01-neutral 5y CDS hedge (dealer sells) & 0.671 & 0.702 & 0.637 & 0.734 & 0.687\\
+Dealer JTD, unhedged & 0.600 & 0.600 & 0.600 & 0.600 & 0.600\\
+Dealer JTD, CS01-hedged & 0.197 & 0.179 & 0.218 & 0.159 & 0.188\\\bottomrule
+\end{tabular}
+\end{center}
+CS01 bumps one name's par spread curve by 1bp and re-bootstraps; bucketed CS01 puts almost all the risk
+at the 5y node and exactly zero at 7y and 10y. Correl01 is $+11.1$bp of notional per $+1\%$ correlation;
+lowering the recovery assumption by 1\% with spreads fixed costs the investor 1.9bp.
+
+\subsection{The dealer's hedge and what it cannot hedge}
+The dealer is long FtD protection; it sells 5y protection on each name with notional
+$h_i=\mathrm{CS01}^{\rm FtD}_i/\mathrm{CS01}^{\rm CDS}_i$, in total 3.4 times the note notional.
+\begin{itemize}[nosep]
+\item \textbf{CS01-neutral is not JTD-neutral.} If name $i$ defaults now the dealer gains $1-R=0.6$ on the
+FtD but loses only $h_i(1-R)\approx0.4$ on the hedge: it remains long about 0.16--0.22 of jump-to-default
+per name. Matching JTD instead ($h_i=1$) would leave large CS01 exposure.
+\item \textbf{Correlation is unhedgeable with single-name CDS}: their values do not depend on $\rho$
+at all. Correlation risk can be hedged with instruments whose value depends on it, such as index tranches,
+where market correlation is quoted as \emph{base correlation}. Mapping a bespoke five-name basket to
+index base correlations is itself a model choice.
+\item \textbf{Gamma and contagion}: hedge ratios change as spreads move and must be rebalanced; after a
+first default the surviving names' spreads typically jump up, which hurts a dealer who is short protection
+on them.
+\end{itemize}
+
+\subsection{Hedge backtest}
+Over one year, hazard curves move by correlated lognormal multipliers (volatility 50\%, correlation
+0.5) and a name defaults when its realised cumulative hazard crosses a threshold drawn from the
+Gaussian copula ($\rho=0.3$), so spreads widen before defaults. The dealer marks to the model at each
+date and rebalances monthly. Over 3{,}000 paths (101 with a default):
+\begin{center}\small
+\begin{tabular}{lrr}\toprule
+One-year P\&L (bp of notional) & unhedged & CS01-hedged\\\midrule
+mean (all paths) & $-5$ & $+29$\\
+standard deviation (paths without a default) & 485 & 18\\
+mean carry & $-365$ & $-48$\\
+mean P\&L given a default & $+5{,}871$ & $+1{,}674$\\
+5th / 95th percentile & $-881$ / $+1{,}033$ & $-61$ / $-2$\\\bottomrule
+\end{tabular}
+\end{center}
+Hedging removes about 96\% of the spread-driven dispersion. What is left is the default exposure: the
+hedged book bleeds a little carry and time decay in normal years and makes about 17\% of notional when a
+name defaults. The hedged mean of $+29$bp (standard error about 6bp) is a \emph{model mismatch}, not
+alpha. The simulated market has no contagion, so the dealer unwinds its short protection on the survivors
+at unchanged spreads after a default. The copula prices those survivors as riskier after a default. The
+unhedged position, which has no such hedges, averages zero within error, as fair pricing requires.
+
+\section{Risks}
+\begin{itemize}[nosep]
+\item \textbf{To the investor:} the first default among five names costs $1-R\approx60\%$ of principal;
+correlation (lower correlation hurts the investor); recovery uncertainty (auction outcomes vary widely);
+collateral and SPV risk (ignored in the base case); liquidity (bespoke notes are hard to sell); model risk
+(the Gaussian copula has no tail dependence).
+\item \textbf{To the dealer:} jump-to-default and correlation exposure left after CS01 hedging; gamma and
+rebalancing costs; contagion; documentation basis between the note and the hedges.
+\end{itemize}
+
+\section{Limitations of this implementation}
+Simplified accrual conventions (no ACT/360, IMM dates or business days); deterministic rates independent
+of defaults; constant recovery; static copula correlation; no issuer or collateral default; synthetic
+market data; the backtest's spread dynamics are not derived from the pricing model, and there is no contagion.
+
+\appendix
+\section{Illustrative term sheet (not an offer; synthetic)}
+\begin{center}\small
+\begin{tabular}{p{0.32\textwidth}p{0.6\textwidth}}\toprule
+Issuer & Illustrative SPV Ltd (bankruptcy-remote), collateralised by AAA-rated government bonds\\
+Notional & EUR 10,000,000; issue price 100\%\\
+Maturity & 5 years\\
+Reference basket & Names A--E (five investment-grade corporates; synthetic)\\
+Coupon & Compounded overnight index rate + 3.72\% per annum, quarterly, until maturity or the first
+credit event (no accrued coupon after a credit event)\\
+Credit events & Bankruptcy, failure to pay (ISDA 2014 definitions)\\
+Settlement on a credit event & Early redemption at notional $\times$ auction final price of the first
+reference entity to suffer a credit event\\
+Redemption at maturity & 100\% if no credit event has occurred\\
+Main risks & Loss of up to $(1-R)$ of principal on the first default in the basket; correlation, recovery,
+collateral, liquidity and model risk\\\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{thebibliography}{9}
+\bibitem{okane2008} D.~O'Kane. \emph{Modelling Single-name and Multi-name Credit Derivatives}. Wiley, 2008.
+\bibitem{li2000} D.~X.~Li. On default correlation: a copula function approach. \emph{Journal of Fixed
+Income}, 9(4):43--54, 2000.
+\bibitem{hw2004} J.~Hull and A.~White. Valuation of a CDO and an $n$th to default CDS without Monte
+Carlo simulation. \emph{Journal of Derivatives}, 12(2):8--23, 2004.
+\bibitem{isda} ISDA CDS Standard Model, documentation and source code (cdsmodel.com).
+\bibitem{slepian1962} D.~Slepian. The one-sided barrier problem for Gaussian noise. \emph{Bell System
+Technical Journal}, 41(2):463--501, 1962.
+\end{thebibliography}
+\end{document}
