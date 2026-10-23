@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+runs/
+data/
+.cache/
+# LaTeX build artefacts
+notes/*.aux
+notes/*.log
+notes/*.out
+notes/*.toc
+notes/*.fls
+notes/*.fdb_latexmk
+notes/*.synctex.gz
+notes/*.bbl
+notes/*.blg
