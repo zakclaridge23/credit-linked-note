@@ -11,7 +11,8 @@ so the first-to-default survival is
 
 computed by Gauss–Hermite quadrature in M (Hull & White 2004 style semi-analytic
 pricing; a fine trapezoid rule replaces it for rho > 0.9). For name-specific
-recoveries the protection leg needs which name defaults first: conditional on M, P(tau_1 in dt, first is i) =
+recoveries the protection leg needs which name defaults first: conditional on M,
+P(tau_1 in dt, first is i) =
 dp_i(t|M) prod_{j != i} (1 - p_j(t|M)), discretised on the fine grid and then
 rescaled so that the shares add up to the exact -dS_1.
 """
