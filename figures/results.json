@@ -1,0 +1,146 @@
+{
+  "note": {
+    "rho": 0.3,
+    "fair_spread_bp": 372.13,
+    "ftd_spread_bp": 366.58,
+    "cs01_bp_per_bp": [
+      -2.974,
+      -3.084,
+      -2.839,
+      -3.201,
+      -3.032
+    ],
+    "cs01_total": -15.13,
+    "hedge_notional": [
+      0.671,
+      0.702,
+      0.637,
+      0.734,
+      0.687
+    ],
+    "correl01_bp": 11.08,
+    "rec01_bp": -1.88,
+    "jtd_investor": [
+      -0.6,
+      -0.6,
+      -0.6,
+      -0.6,
+      -0.6
+    ],
+    "dealer_jtd_hedged": [
+      0.1971,
+      0.1791,
+      0.218,
+      0.1594,
+      0.1878
+    ]
+  },
+  "correlation": {
+    "sum_singles_bp": 455.0,
+    "widest_bp": 125.0,
+    "ftd_rho0_bp": 443.22,
+    "ftd_rho099_bp": 129.75,
+    "mc": [
+      {
+        "rho": 0.0,
+        "copula": "gaussian",
+        "spread": 443.38,
+        "se": 1.16
+      },
+      {
+        "rho": 0.0,
+        "copula": "student",
+        "spread": 383.53,
+        "se": 1.22
+      },
+      {
+        "rho": 0.2,
+        "copula": "gaussian",
+        "spread": 392.31,
+        "se": 1.0
+      },
+      {
+        "rho": 0.2,
+        "copula": "student",
+        "spread": 341.25,
+        "se": 1.07
+      },
+      {
+        "rho": 0.4,
+        "copula": "gaussian",
+        "spread": 339.23,
+        "se": 0.89
+      },
+      {
+        "rho": 0.4,
+        "copula": "student",
+        "spread": 297.32,
+        "se": 0.93
+      },
+      {
+        "rho": 0.6,
+        "copula": "gaussian",
+        "spread": 281.78,
+        "se": 0.82
+      },
+      {
+        "rho": 0.6,
+        "copula": "student",
+        "spread": 252.61,
+        "se": 0.83
+      },
+      {
+        "rho": 0.8,
+        "copula": "gaussian",
+        "spread": 216.05,
+        "se": 0.74
+      },
+      {
+        "rho": 0.8,
+        "copula": "student",
+        "spread": 198.17,
+        "se": 0.72
+      },
+      {
+        "rho": 0.95,
+        "copula": "gaussian",
+        "spread": 153.62,
+        "se": 0.64
+      },
+      {
+        "rho": 0.95,
+        "copula": "student",
+        "spread": 148.4,
+        "se": 0.63
+      }
+    ]
+  },
+  "backtest": {
+    "unhedged": {
+      "paths": 3000,
+      "defaults": 101,
+      "mean_total_bp": -5.1,
+      "sd_total_bp": 1189.0,
+      "sd_no_default_bp": 485.0,
+      "mean_spread_bp": 163.8,
+      "sd_spread_no_default_bp": 485.0,
+      "mean_carry_bp": -365.4,
+      "mean_default_pnl_given_default_bp": 5871.0,
+      "p5_bp": -881.1,
+      "p95_bp": 1033.0
+    },
+    "hedged": {
+      "paths": 3000,
+      "defaults": 101,
+      "mean_total_bp": 29.3,
+      "sd_total_bp": 313.7,
+      "sd_no_default_bp": 18.4,
+      "mean_spread_bp": 20.4,
+      "sd_spread_no_default_bp": 59.3,
+      "mean_carry_bp": -47.9,
+      "mean_default_pnl_given_default_bp": 1673.6,
+      "p5_bp": -61.4,
+      "p95_bp": -1.9
+    }
+  }
+}
