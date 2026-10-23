@@ -30,13 +30,13 @@ STEPS_PER_QUARTER = 90
 FREQ = 4
 
 
-def time_grid(t0: float, T: float) -> np.ndarray:
+def time_grid(t0: float, T: float, steps: int = STEPS_PER_QUARTER) -> np.ndarray:
     """Fine grid on [t0, T] containing every quarterly date after t0 and T itself."""
     pay = premium_dates(t0, T)
     pts = [np.array([t0])]
     prev = t0
     for d in pay:
-        n = max(round((d - prev) * FREQ * STEPS_PER_QUARTER), 1)
+        n = max(round((d - prev) * FREQ * steps), 1)
         pts.append(np.linspace(prev, d, n + 1)[1:])
         prev = d
     return np.concatenate(pts)
@@ -77,9 +77,14 @@ def legs_from_survival(
 
 
 def cds_legs(
-    hc: HazardCurve, dc: DiscountCurve, T: float, recovery: float, t0: float = 0.0
+    hc: HazardCurve,
+    dc: DiscountCurve,
+    T: float,
+    recovery: float,
+    t0: float = 0.0,
+    steps: int = STEPS_PER_QUARTER,
 ) -> Legs:
-    g = time_grid(t0, T)
+    g = time_grid(t0, T, steps)
     S = hc.survival(g) / hc.survival(t0)
     P = dc.df(g) / dc.df(t0)
     return legs_from_survival(g, S, P, t0, T, recovery)
@@ -124,5 +129,11 @@ def bootstrap(
             hc = HazardCurve(PiecewiseFlat(tenors[: k + 1], np.array([*rates, lam])))
             return par_spread(hc, dc, T, recovery) - s
 
-        rates.append(brentq(err, 1e-8, 5.0, xtol=1e-14))
+        lo, hi = 1e-10, 50.0
+        if err(lo) > 0 or err(hi) < 0:
+            raise ValueError(
+                f"{T:g}y spread {s * 1e4:.1f}bp cannot be matched with a non-negative hazard "
+                "given the shorter tenors (the quotes are inconsistent)"
+            )
+        rates.append(brentq(err, lo, hi, xtol=1e-14))
     return HazardCurve(PiecewiseFlat(tenors, np.array(rates)))
