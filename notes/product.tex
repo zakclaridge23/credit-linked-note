@@ -103,11 +103,10 @@ trapezoid rule there. With name-specific recoveries the protection leg uses
 \[P(\tau_1\in\mathrm dt,\ \text{first}=i\mid M)=\mathrm dp_i(t|M)\prod_{j\ne i}\big(1-p_j(t|M)\big).\]
 The FtD swap's legs are those of a CDS with survival $S_1$.
 
-\paragraph{Monte Carlo.} Default times are simulated by inverting the cumulative hazard,
-$\tau_i=\Lambda_i^{-1}(-\log U_i)$, with antithetic variates, and the legs are evaluated exactly on
-each path. The
-semi-analytic and Monte Carlo spreads agree within one to two standard errors at every correlation
-(e.g.\ at $\rho=0.6$, 280.83bp semi-analytic against $281.19\pm0.37$bp from 2 million paths).
+\paragraph{Monte Carlo.} We simulate $\tau_i=\Lambda_i^{-1}(-\log U_i)$, the inverse of the cumulative
+hazard, with antithetic variates, and evaluate the legs exactly on each path. The semi-analytic and
+Monte Carlo spreads agree within one to two standard errors at every correlation (e.g.\ at $\rho=0.6$,
+280.83bp semi-analytic against $281.19\pm0.37$bp from 2 million paths).
 
 \subsection{CLN valuation}
 With deterministic rates independent of defaults and coupons stopping at default (no accrued coupon),
